@@ -1,0 +1,24 @@
+id: p3-over-trigger-lint
+title: over-trigger：规范 lint 请求应路由拒绝到 skill linter
+description: |
+  验证 NOT 边界：仅做 SKILL.md 规范检查属于 skill linter 触发范围，
+  本 skill 应拒绝接单并路由到 skill linter，不进入生成流程。
+
+input:
+  prompt: |
+    帮我检查一下 es-query 这个 skill 的 SKILL.md 写得规不规范，有没有
+    格式问题。最终回复请一次性给出完整结论，不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① 路由到 skill linter（success-only 锚点，取交付物实体）
+    - output_contains:
+        any: ["skill linter", "skill-linter", "linter"]
+    # ② 明确不属本 skill 触发范围的拒绝措辞
+    - output_contains:
+        any: ["不属于", "不触发", "建议使用", "更适合", "范围"]

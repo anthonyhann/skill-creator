@@ -1,0 +1,10 @@
+{
+  "skill": "skill-creator",
+  "report": {
+    "errors": [],
+    "warnings": [],
+    "error_count": 0,
+    "warning_count": 0,
+    "passed": true
+  }
+}

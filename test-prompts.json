@@ -1,0 +1,68 @@
+{
+  "skill_name": "skill-creator",
+  "test_prompts": [
+    {
+      "id": "happy-1",
+      "prompt": "帮我创建一个根据中文业务描述生成 MySQL 建表 SQL 的 skill，要求输出 SQL 且禁止 DROP。",
+      "expected": "走 CREATE 入口：7 问采集需求规格、复用优先诊断、E1/E2/E3 证据门禁、匹配 P5+P1 模式生成草稿、安全审计后在 Checkpoint 1.5 等待用户确认。",
+      "assertions": [
+        { "type": "contains", "value": "需求规格" },
+        { "type": "contains", "value": "入口模式" },
+        { "type": "ask_before_act", "value": "Checkpoint 1.5 等待用户确认后才进入 Phase 2" }
+      ]
+    },
+    {
+      "id": "boundary-1",
+      "prompt": "我这个需求到底该新建一个 skill 还是复用现有的？我想让 agent 自动核对两份 Excel 的差异。",
+      "expected": "走 DIAGNOSE 入口：先扫描已安装 skill 做复用优先诊断，输出复用/改进/新建建议并等待用户选择，不直接开始生成。",
+      "assertions": [
+        { "type": "ask_before_act", "value": "先输出复用诊断结论并等待用户选择" },
+        { "type": "contains", "value": "复用" }
+      ]
+    },
+    {
+      "id": "over-trigger-1",
+      "prompt": "帮我检查一下 es-query 这个 skill 的 SKILL.md 写得规不规范，有没有格式问题。",
+      "expected": "应拒绝触发本 skill（仅做规范检查属于 skill linter 的范畴），建议使用 skill linter 工具。",
+      "assertions": [
+        { "type": "route_reject", "value": "规范 lint 不属于本 skill 触发范围" },
+        { "type": "contains", "value": "skill linter" }
+      ]
+    },
+    {
+      "id": "under-spec-1",
+      "prompt": "帮我生成一个 skill。",
+      "expected": "先按问题库追问核心信息（做什么/何时触发/输入/输出/约束），置信度补齐前不得直接生成 SKILL.md。",
+      "assertions": [
+        { "type": "ask_before_act", "value": "先补齐关键信息再生成" },
+        { "type": "not_contains", "value": "## 诚实边界" }
+      ]
+    },
+    {
+      "id": "writing-quality-pointer",
+      "prompt": "帮我创建一个查 Doris 数据的 skill，草稿 description 写的是：「这个 skill 很强大，能帮你完成各种数据查询任务，希望你喜欢使用它。」",
+      "expected": "Step 1.4 QW1 检查不通过：description 未 context-pointer 化（没陈述材料是什么、没列触发分支、触发词口语化模糊）；按 references/writing-for-agents.md 重写为「Doris 只读 SQL 查询 skill：执行自然语言转 SQL 并返回 Markdown 表格。触发词：Doris 查询、查数据……」形态后回改草稿再过检查，不携带问题进 Phase 2",
+      "assertions": [
+        { "type": "contains", "value": "writing-for-agents" },
+        { "type": "contains", "value": "context-pointer" }
+      ]
+    },
+    {
+      "id": "writing-quality-noop",
+      "prompt": "生成的草稿里有一句「请仔细认真地处理每一个输入，不要粗心大意」，Step 1.4 会不会拦？",
+      "expected": "Step 1.4 QW4 检查判定为 no-op 句（相对模型默认不改变行为；否定句半读成指令）；修复为删整句而非删词；若确需强调穷尽性，换强词（如「每个输入都有交代，无静默跳过」的可判定判据）",
+      "assertions": [
+        { "type": "contains", "value": "no-op" }
+      ]
+    },
+    {
+      "id": "writing-quality-disclosure",
+      "prompt": "我想要的 skill 有两个分支：线上环境查询和本地文件查询，各自的规则很长，全写在 SKILL.md 正文里行吗？",
+      "expected": "Step 1.4 QW2 progressive disclosure 判据：两分支各自独有的规则下推到 references（pointer 触达才加载），全分支共用的步骤与铁律内联；正文有 steps 时不让 in-file reference 埋掉 steps；leading words 建议与 leading word 前置",
+      "assertions": [
+        { "type": "contains", "value": "progressive disclosure" }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,30 @@
+id: p1-happy-create
+title: CREATE 入口 happy path（7 问采集 + 证据门禁 + Checkpoint 1.5 停等确认）
+description: |
+  验证 CREATE 入口主流程：按问题库采集需求规格（做什么/何时触发/输入/
+  输出/约束/依赖）、复用优先诊断、E1/E2/E3 证据门禁，生成草稿前在
+  Checkpoint 1.5 停等用户确认，不跳过采集直接产出 SKILL.md。
+
+input:
+  prompt: |
+    帮我创建一个根据中文业务描述生成 MySQL 建表 SQL 的 skill，要求输出 SQL
+    且禁止 DROP。最终回复请一次性包含完整流程输出（入口模式/需求规格/
+    证据结论/下一步），不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① 需求规格采集可见
+    - output_contains:
+        any: ["需求规格", "规格：", "做什么"]
+    # ② 入口模式分流可见
+    - output_contains:
+        any: ["入口模式", "CREATE"]
+    # ③ Checkpoint 停等确认（不直接生成）
+    - output_contains:
+        any: ["Checkpoint 1.5", "等待确认", "确认后", "待确认"]
+

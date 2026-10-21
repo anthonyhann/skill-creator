@@ -1,0 +1,55 @@
+# skill-up 评测配置 schema 版本，勿改
+schema_version: v1alpha1
+
+environment:
+  # meta 工具类 skill（skill 生成器），评测只验证协议行为问答与护栏，无需沙箱
+  type: none
+
+skills:
+  # 被测 skill 本身
+  - source: local_path
+    path: .
+
+engine:
+  # 用 Claude Code 执行（默认公开 claude CLI，可用 SKILLUP_CLAUDE_CMD
+  # 环境变量覆盖为兼容 CLI）。wrapper 防护说明见 scripts/run-claude.sh
+  # 头部注释；仅支持单轮用例。
+  name: claude-code-nosid
+  custom:
+    transport: local
+    response_format: text
+    timeout_seconds: 600
+    local:
+      command: bash
+      args:
+        # ⚠️ wrapper 必须在 scripts/（非 evals/scripts/）：skill staging 始终
+        # 排除 evals/ 目录，engine 命令相对路径基于 runtime workspace。
+        - scripts/run-claude.sh
+        - ${input_file}
+
+cases:
+  files:
+    # happy path：CREATE 入口 7 问采集 + 复用诊断 + 证据门禁 + Checkpoint 1.5 停等
+    - evals/cases/p1-happy-create.yaml
+    # DIAGNOSE 入口：复用优先诊断，先建议后行动
+    - evals/cases/p2-diagnose-reuse.yaml
+    # over-trigger：规范 lint 请求应路由拒绝到 skill linter
+    - evals/cases/p3-over-trigger-lint.yaml
+    # under-spec：模糊需求必须先追问补齐，禁止直接生成
+    - evals/cases/p4-under-spec-vague.yaml
+    # QW1 description context-pointer 化检查
+    - evals/cases/p5-writing-qw1-pointer.yaml
+    # QW4 no-op 句清除
+    - evals/cases/p6-writing-qw4-noop.yaml
+    # QW2 progressive disclosure 分层
+    - evals/cases/p7-writing-qw2-disclosure.yaml
+  defaults:
+    timeout_seconds: 600
+    max_turns: 4
+    retry_policy:
+      max_retries: 2
+      retry_on: [timeout, error]
+
+report:
+  formats: [json, html]
+

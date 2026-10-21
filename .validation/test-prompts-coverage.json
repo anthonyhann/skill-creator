@@ -1,0 +1,16 @@
+{
+  "skill": "skill-creator",
+  "stats": {
+    "total_cases": 7,
+    "assertion_type_counts": {
+      "contains": 8,
+      "ask_before_act": 3,
+      "route_reject": 1,
+      "not_contains": 1
+    },
+    "coverage": {
+      "has_over_trigger": true,
+      "has_under_spec": true
+    }
+  }
+}

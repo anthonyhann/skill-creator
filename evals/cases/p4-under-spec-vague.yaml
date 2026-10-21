@@ -1,0 +1,25 @@
+id: p4-under-spec-vague
+title: under-spec：模糊需求必须先追问补齐，禁止直接生成
+description: |
+  验证 under-spec 防护：「帮我生成一个 skill」缺全部关键参数，必须先按
+  问题库追问核心信息（做什么/何时触发/输入/输出/约束），置信度补齐前
+  不得直接生成最终 SKILL.md。
+
+input:
+  prompt: |
+    帮我生成一个 skill。最终回复请一次性包含你要追问的完整问题清单，不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① 追问核心规格项（至少命中一类）
+    - output_contains:
+        any: ["做什么", "何时触发", "输入", "输出", "约束", "触发场景"]
+    # ② 先补齐再生成的追问姿态
+    - output_contains:
+        any: ["先确认", "请先", "追问", "补充", "需要了解"]
+

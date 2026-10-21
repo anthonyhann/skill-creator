@@ -1,0 +1,28 @@
+id: p2-diagnose-reuse
+title: DIAGNOSE 入口：复用优先诊断先建议后行动
+description: |
+  验证不确定新建还是复用时走 DIAGNOSE 入口：先扫描已安装 skill 做复用
+  优先诊断，输出复用/改进/新建建议并等待用户选择，不直接开始生成。
+
+input:
+  prompt: |
+    我这个需求到底该新建一个 skill 还是复用现有的？我想让 agent 自动核对
+    两份 Excel 的差异。最终回复请一次性给出完整诊断结论与建议，不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① 复用诊断三分支建议可见
+    - output_contains:
+        any: ["复用", "改进", "新建"]
+    # ② 停等用户选择（不直接生成）
+    - output_contains:
+        any: ["等待", "确认", "选择", "建议"]
+    # ③ 诊断动作可见（扫描/覆盖率判定）
+    - output_contains:
+        any: ["诊断", "扫描", "覆盖"]
+

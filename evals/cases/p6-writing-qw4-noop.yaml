@@ -1,0 +1,27 @@
+id: p6-writing-qw4-noop
+title: QW4 检查：no-op 句应判拦截并删整句而非删词
+description: |
+  验证 Step 1.4 QW4 写作质量门禁：「请仔细认真地处理每一个输入，不要
+  粗心大意」相对模型默认不改变行为，判定为 no-op 句；修复为删整句而非
+  删词；确需强调穷尽性时换可判定判据。
+
+input:
+  prompt: |
+    生成的草稿里有一句「请仔细认真地处理每一个输入，不要粗心大意」，
+    Step 1.4 会不会拦？最终回复请一次性给出完整判定依据与修复建议，
+    不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① no-op 判定可见
+    - output_contains:
+        any: ["no-op", "no op", "QW4"]
+    # ② 修复手法（删整句 / 换强词 / 可判定判据）
+    - output_contains:
+        any: ["删整句", "删除整句", "整句删", "强词", "判据", "默认"]
+

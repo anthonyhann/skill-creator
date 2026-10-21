@@ -1,0 +1,27 @@
+id: p5-writing-qw1-pointer
+title: QW1 检查：description 未 context-pointer 化应拦截并按 writing-for-agents 重写
+description: |
+  验证 Step 1.4 QW1 写作质量门禁：description 写成自夸式模糊句（未陈述
+  材料是什么、未列触发分支）时，QW1 判定不通过，按 writing-for-agents
+  重写为 context-pointer 形态后回改草稿，不携带问题进 Phase 2。
+
+input:
+  prompt: |
+    帮我创建一个查 Doris 数据的 skill，草稿 description 写的是：「这个
+    skill 很强大，能帮你完成各种数据查询任务，希望你喜欢使用它。」
+    这样写行吗？最终回复请一次性包含完整判定与重写建议，不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① 判定依据引用 writing-for-agents / context-pointer
+    - output_contains:
+        any: ["writing-for-agents", "context-pointer", "context pointer"]
+    # ② QW1 检查项可见
+    - output_contains:
+        any: ["QW1", "context pointer", "触发分支", "触发词"]
+

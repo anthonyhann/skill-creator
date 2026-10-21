@@ -1,0 +1,27 @@
+id: p7-writing-qw2-disclosure
+title: QW2 检查：分支规则按 progressive disclosure 分层下推
+description: |
+  验证 Step 1.4 QW2 写作质量门禁：两分支各自独有的长规则应下推到
+  references（pointer 触达才加载），全分支共用的步骤与铁律内联；
+  文档有 steps 时不让 in-file reference 埋掉 steps。
+
+input:
+  prompt: |
+    我想要的 skill 有两个分支：线上环境查询和本地文件查询，各自的规则
+    很长，全写在 SKILL.md 正文里行吗？最终回复请一次性给出完整分层
+    建议与理由，不要只给摘要。
+
+constraints:
+  timeout_seconds: 600
+  max_turns: 4
+
+judge:
+  type: rule_based
+  success:
+    # ① progressive disclosure / 分层判据可见
+    - output_contains:
+        any: ["progressive disclosure", "下推", "分层", "QW2"]
+    # ② 具体去向（references 下沉 + 共用内联）
+    - output_contains:
+        any: ["references", "内联", "共用"]
+
